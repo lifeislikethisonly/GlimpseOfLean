@@ -88,7 +88,13 @@ symbol you can put your mouse cursor above the symbol and wait for one second.
 -/
 
 example (f g : ℝ → ℝ) (hf : even_fun f) : even_fun (g ∘ f) := by
-  sorry
+  unfold even_fun at hf
+  unfold even_fun
+  intro x
+  calc
+    (g ∘ f) (-x) = (g) (f (-x)) := by rfl
+    _            = (g) (f (x))  := by rw [hf x]
+
 
 /-
 Let's have more quantifiers, and play with forward and backward reasoning.
@@ -124,6 +130,7 @@ example (f g : ℝ → ℝ) (hf : non_decreasing f) (hg : non_decreasing g) :
     non_decreasing (g ∘ f) := by
   intro x₁ x₂ h
   specialize hf x₁ x₂ h
+  unfold non_decreasing at hg
   exact hg (f x₁) (f x₂) hf
 
 /-
@@ -156,7 +163,11 @@ example (f g : ℝ → ℝ) (hf : non_decreasing f) (hg : non_decreasing g) :
 
 example (f g : ℝ → ℝ) (hf : non_decreasing f) (hg : non_increasing g) :
     non_increasing (g ∘ f) := by
-  sorry
+  intro x₁ x₂ h
+  have hgs: f x₁ ≤  f x₂:= by apply hf; exact h
+  specialize hg (f x₁) (f x₂) hgs
+  exact hg
+
 
 /- # Finding lemmas
 
@@ -170,7 +181,8 @@ The following exercises teach you two techniques to avoid needing to remember na
 /- Use `simp` as a first step to prove the following. Note that `X : Set ℝ`
 means that `X` is a set containing (only) real numbers. -/
 example (x : ℝ) (X Y : Set ℝ) (hx : x ∈ X) : x ∈ (X ∩ Y) ∪ (X \ Y) := by
-  sorry
+  simp
+  exact hx
 
 /- Use `apply?` to find the lemma that every continuous function with compact support
 has a global minimum. You can click on the suggestion that appears to replace
@@ -178,7 +190,9 @@ has a global minimum. You can click on the suggestion that appears to replace
 -/
 
 example (f : ℝ → ℝ) (hf : Continuous f) (h2f : HasCompactSupport f) : ∃ x, ∀ y, f x ≤ f y := by
-  sorry
+  exact Continuous.exists_forall_le_of_hasCompactSupport hf h2f
+
+
 
 /-
 Note that `apply?` does not only suggest full proofs. It can suggest lemmas that
@@ -186,7 +200,7 @@ apply but require to check side conditions. Accepting such a suggestion
 will output incomplete proofs using the `refine` tactic.
 
 Note that each suggestion comes with a list of side conditions that would need
-to be check. So you need to decide which suggestion to accept depending on what
+to be checked. So you need to decide which suggestion to accept depending on what
 the side conditions look like. For instance, if the goal is to prove continuity of
 a function, one lemma always applies: the lemma saying that any function out of
 a discrete topological space is continuous. But it leaves as a side condition
@@ -227,4 +241,3 @@ You can start with specialized files in the `Topics` folder. You have choice bet
 Note the two logic files are really for people interested in logic as a goal, not logic
 as a tool.
 -/
-
