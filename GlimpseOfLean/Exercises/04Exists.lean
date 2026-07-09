@@ -37,8 +37,22 @@ example (p q r s : Prop) (h : p → r) (h' : q → s) : p ∧ q → r ∧ s := b
 
 /- You can choose your own style in the next exercise. -/
 
+lemma pimpq (p q: Prop) (hp: p) (hq: q): p → q:= by
+  intro p
+  apply hq
+
 example (p q r : Prop) : (p → (q → r)) ↔ p ∧ q → r := by
-  sorry
+  constructor
+  · intro pqr
+    intro pq
+    rcases pq with ⟨pt, qt⟩
+    have qimpr: q → r:= by exact pqr pt
+    exact qimpr qt
+  · intro pqr
+    intro pt
+    intro qt
+    have pq: p ∧ q:= by exact ⟨pt, qt⟩
+    apply pqr pq
 
 /- Of course Lean doesn't need any help to prove this kind of logical tautologies.
 This is the job of the `tauto` tactic, which can prove true statements in propositional logic. -/
@@ -79,7 +93,13 @@ By definition, `a ∣ b ↔ ∃ k, b = a*k`, so you can prove `a ∣ b` using th
 -/
 
 example (a b c : ℤ) (h₁ : a ∣ b) (h₂ : b ∣ c) : a ∣ c := by
-  sorry
+  rcases h₁ with ⟨k₁, hk₁⟩
+  rcases h₂ with ⟨k₂, hk₂⟩
+  use k₁*k₂
+  calc
+    c = b * k₂ := by apply hk₂
+    _ = (a * k₁) * k₂ := by rw [hk₁]
+    _ = a * (k₁ * k₂) := by apply mul_assoc
 
 
 /-
@@ -89,7 +109,15 @@ We can now start combining quantifiers, using the definition
 -/
 
 example (f g : ℝ → ℝ) (h : Surjective (g ∘ f)) : Surjective g := by
-  sorry
+  unfold Surjective at h
+  unfold Surjective
+  intro b
+  specialize h b
+  rcases h with ⟨a, h⟩
+  use (f a)
+  apply h
+
+
 
 /- This is the end of this file about `∃` and `∧`. You've learned about tactics
 * `rcases`
@@ -102,4 +130,3 @@ actual mathematical content. You now get to choose one file from the `Topics`.
 
 See the bottom of `03Forall` for descriptions of the choices.
 -/
-
