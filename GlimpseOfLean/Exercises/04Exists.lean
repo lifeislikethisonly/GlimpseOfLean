@@ -37,10 +37,6 @@ example (p q r s : Prop) (h : p → r) (h' : q → s) : p ∧ q → r ∧ s := b
 
 /- You can choose your own style in the next exercise. -/
 
-lemma pimpq (p q: Prop) (hp: p) (hq: q): p → q:= by
-  intro p
-  apply hq
-
 example (p q r : Prop) : (p → (q → r)) ↔ p ∧ q → r := by
   constructor
   · intro pqr
